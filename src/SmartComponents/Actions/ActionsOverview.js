@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import asyncComponent from '../../Utilities/asyncComponent';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -15,7 +14,6 @@ import '../../App.scss';
 
 const SummaryChart = asyncComponent(() => import('../../PresentationalComponents/Charts/SummaryChart/SummaryChart'));
 const SummaryChartItem = asyncComponent(() => import('../../PresentationalComponents/Charts/SummaryChart/SummaryChartItem'));
-const ConditionalLink = asyncComponent(() => import('../../PresentationalComponents/ConditionalLink/ConditionalLink'));
 const ActionsOverviewDonut = asyncComponent(() => import('../../PresentationalComponents/Charts/ActionsOverviewDonut'));
 
 class ActionsOverview extends Component {
@@ -46,19 +44,12 @@ class ActionsOverview extends Component {
          const riskName = invert(SEVERITY_MAP)[key];
          const normalizedRiskName = capitalize(riskName.split('-')[0]);
 
-         return  <ConditionalLink
+         return <SummaryChartItem
+             affectedSystems={ totalIssues }
              key={ key }
-             condition={ value }
-             wrap={ children =>
-                 <Link to={ `/actions/${riskName}` }>
-                     { children }
-                 </Link>
-             }>
-             <SummaryChartItem
-                 name={ normalizedRiskName }
-                 numIssues={ value }
-                 totalIssues={ totalIssues }/>
-         </ConditionalLink>;
+             name={ normalizedRiskName }
+             numIssues={ value }
+             riskName={ riskName } />;
      });
 
      render () {
@@ -75,8 +66,8 @@ class ActionsOverview extends Component {
                 </PageHeader>
                 <Main className='pf-m-light pf-u-box-shadow-md-bottom'>
                     <Grid gutter='lg'>
-                        <GridItem className='pf-u-pr-xl-on-xl pf-u-mr-xl-on-xl' xl={ 4 } lg={ 4 } md={ 8 } sm={ 8 }>
-                            <Title size='lg' headingLevel='h3'>Risk Summary</Title>
+                        <GridItem className='pf-u-pr-xl-on-xl pf-u-mr-xl-on-xl' xl={ 5 } lg={ 6 } md={ 8 } sm={ 8 }>
+                            <Title size='lg' headingLevel='h3'>Rule hits by severity</Title>
                             { statsFetchStatus === 'fulfilled' && (
                                 <SummaryChart className='pf-u-mt-md'>
                                     { this.summaryChart(totalRisk, total) }
@@ -84,7 +75,7 @@ class ActionsOverview extends Component {
                             ) }
                             { statsFetchStatus === 'pending' && (<Loading/>) }
                         </GridItem>
-                        <GridItem xl={ 6 } lg={ 7 } md={ 11 } sm={ 8 }>
+                        <GridItem xl={ 6 } lg={ 7 } md={ 11 } sm={ 8 } style={ { borderColor: 'red' } }>
                             <Title size='lg' headingLevel='h3'>Rule hits by category</Title>
                             { statsFetchStatus === 'fulfilled' && (
                                 <ActionsOverviewDonut category={ category } className='pf-u-mt-md'/>
